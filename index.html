@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IFK | Yayasan Inisiatif, Fasilitasi, Kolaborasi untuk Papua</title>
+    <link rel="icon" type="image/png" href="./img/logo.png">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <!-- Google Font: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --forest: #2F6B3F;
+            --ocean: #0E4E65;
+            --gold: #F2B233;
+            --earth: #6A4328;
+            --cream: #F5E8C7;
+            --soft-shadow: 0 12px 30px rgba(14, 78, 101, 0.18);
+            --soft-shadow-lg: 0 22px 48px rgba(14, 78, 101, 0.2);
+        }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            background: var(--cream);
+            color: var(--earth);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        section[id], header[id] {
+            scroll-margin-top: 96px;
+        }
+        
+        .hero-bg {
+            background-image:
+                linear-gradient(135deg, rgba(14, 78, 101, 0.82), rgba(47, 107, 63, 0.72), rgba(106, 67, 40, 0.58)),
+                url('./img/danau.png');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--soft-shadow-lg);
+        }
+        
+        .tail-container {
+            max-width: 1280px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .logo-circle {
+            border-radius: 999px;
+            border: 2.5px solid rgba(242, 178, 51, 0.95);
+            padding: 0.35rem;
+            background: transparent;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.32);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: var(--soft-shadow);
+        }
+
+        .card-modern {
+            background: rgba(255, 255, 255, 0.68);
+            border: 1px solid rgba(14, 78, 101, 0.14);
+            box-shadow: var(--soft-shadow);
+        }
+
+        .section-light {
+            background: linear-gradient(180deg, rgba(245, 232, 199, 0.84), rgba(255, 255, 255, 0.76));
+        }
+
+        .section-cream {
+            background: linear-gradient(180deg, rgba(245, 232, 199, 0.95), rgba(234, 220, 186, 0.88));
+        }
+
+        .section-title {
+            color: var(--ocean);
+        }
+
+        .section-text {
+            color: rgba(106, 67, 40, 0.9);
+        }
+
+        .text-muted {
+            color: rgba(106, 67, 40, 0.74);
+        }
+
+        .chip {
+            background: rgba(14, 78, 101, 0.1);
+            color: var(--ocean);
+            border: 1px solid rgba(14, 78, 101, 0.24);
+        }
+
+        .nav-pill {
+            padding: 0.52rem 1rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: all 0.25s ease;
+        }
+
+        .nav-pill:hover {
+            background: rgba(242, 178, 51, 0.2);
+            border-color: rgba(242, 178, 51, 0.45);
+            color: #fff;
+        }
+
+        .btn-primary {
+            background: linear-gradient(120deg, var(--ocean), var(--forest));
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: var(--soft-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.06);
+        }
+
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1.5px solid rgba(255, 255, 255, 0.58);
+            color: #fff;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+
+        .btn-glass:hover {
+            background: rgba(242, 178, 51, 0.22);
+            border-color: rgba(242, 178, 51, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .btn-cream {
+            background: rgba(245, 232, 199, 0.95);
+            color: var(--ocean);
+            box-shadow: var(--soft-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .btn-cream:hover {
+            background: #fff;
+            transform: scale(1.03);
+        }
+
+        .icon-badge {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+        }
+
+        .icon-forest {
+            background: rgba(47, 107, 63, 0.2);
+            color: var(--forest);
+        }
+
+        .icon-ocean {
+            background: rgba(14, 78, 101, 0.2);
+            color: var(--ocean);
+        }
+
+        .icon-gold {
+            background: rgba(242, 178, 51, 0.25);
+            color: #a9721f;
+        }
+
+        .icon-earth {
+            background: rgba(106, 67, 40, 0.2);
+            color: var(--earth);
+        }
+
+        .icon-chip {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.35rem;
+            box-shadow: var(--soft-shadow);
+        }
+
+        .icon-chip-ocean {
+            background: rgba(14, 78, 101, 0.16);
+        }
+
+        .icon-chip-forest {
+            background: rgba(47, 107, 63, 0.16);
+        }
+
+        .icon-chip-gold {
+            background: rgba(242, 178, 51, 0.22);
+        }
+
+        .input-modern {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(14, 78, 101, 0.22);
+            background: rgba(255, 255, 255, 0.72);
+            color: var(--earth);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .input-modern:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(242, 178, 51, 0.24);
+        }
+
+        .social-link {
+            color: var(--earth);
+            transition: all 0.25s ease;
+        }
+
+        .social-link:hover {
+            color: var(--ocean);
+            transform: translateY(-2px);
+        }
+
+        .brand-cta {
+            background: linear-gradient(120deg, var(--ocean), var(--forest), var(--earth));
+        }
+
+        .footer-brand {
+            background: linear-gradient(140deg, #0b3f53, #244f31, #593621);
+        }
+
+        .sticky-topbar {
+            position: fixed;
+            inset: 0 0 auto 0;
+            transform: translateY(-110%);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.35s ease;
+            z-index: 80;
+            padding: 0.7rem 1rem;
+        }
+
+        .sticky-topbar.show {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .sticky-topbar-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            border-radius: 1rem;
+            background: rgba(255, 255, 255, 0.75);
+            border: 1px solid rgba(14, 78, 101, 0.16);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: var(--soft-shadow);
+        }
+
+        .sticky-link {
+            color: var(--ocean);
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .sticky-link:hover {
+            color: var(--forest);
+        }
+
+        .floating-actions {
+            position: fixed;
+            right: 1.2rem;
+            bottom: 1.4rem;
+            z-index: 90;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+
+        .floating-btn {
+            width: 3.3rem;
+            height: 3.3rem;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.35rem;
+            border: none;
+            cursor: pointer;
+            box-shadow: var(--soft-shadow);
+            transition: all 0.25s ease;
+        }
+
+        .floating-btn:hover {
+            transform: translateY(-3px) scale(1.03);
+        }
+
+        .floating-wa {
+            background: linear-gradient(145deg, #25D366, #199b49);
+        }
+
+        .back-to-top-btn {
+            background: linear-gradient(145deg, var(--ocean), var(--forest));
+            opacity: 0;
+            transform: translateY(12px) scale(0.94);
+            pointer-events: none;
+        }
+
+        .back-to-top-btn.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div id="stickyTopbar" class="sticky-topbar">
+        <div class="sticky-topbar-inner px-4 md:px-6 py-3 flex items-center justify-between gap-4">
+            <a href="#heroHeader" class="flex items-center gap-2 md:gap-3">
+                <img src="./img/logo.png" alt="Logo IFK" class="w-10 h-10 object-contain logo-circle">
+                <span class="font-bold text-sm md:text-base section-title">IFK</span>
+            </a>
+            <div class="hidden md:flex items-center gap-5 text-sm">
+                <a href="#heroHeader" class="sticky-link">Beranda</a>
+                <a href="#tentang" class="sticky-link">Tentang Kami</a>
+                <a href="#kegiatan" class="sticky-link">Kegiatan</a>
+                <a href="#program" class="sticky-link">Program</a>
+                <a href="#faq" class="sticky-link">FAQ</a>
+                <a href="#kontak" class="sticky-link">Kontak</a>
+            </div>
+            <button onclick="document.getElementById('kontak').scrollIntoView({ behavior: 'smooth' })"
+                    class="btn-primary px-4 md:px-5 py-2.5 rounded-xl text-sm font-semibold">
+                Hubungi
+            </button>
+        </div>
+    </div>
+
+    <!-- SECTION 1: HERO HEADER -->
+    <header id="heroHeader" class="hero-bg min-h-screen flex items-center justify-center text-white py-16">
+        <div class="tail-container px-6 text-center max-w-4xl mx-auto">
+            <img src="./img/logo.png"
+                 alt="Logo IFK"
+                 class="w-24 h-24 md:w-28 md:h-28 object-contain mx-auto mb-5 logo-circle">
+            <h1 class="text-5xl md:text-6xl font-bold tracking-tight mb-3">IFK</h1>
+            <p class="text-lg md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto">
+                Yayasan Inisiatif, Fasilitasi, Kolaborasi untuk Papua
+            </p>
+
+            <div class="flex flex-wrap justify-center gap-3 md:gap-6 text-sm md:text-base font-semibold mb-10">
+                <a href="#" class="nav-pill">Beranda</a>
+                <a href="#tentang" class="nav-pill">Tentang Kami</a>
+                <a href="#kegiatan" class="nav-pill">Kegiatan</a>
+                <a href="#program" class="nav-pill">Program</a>
+                <a href="#faq" class="nav-pill">FAQ</a>
+                <a href="#kontak" class="nav-pill">Kontak</a>
+            </div>
+
+            <h2 class="text-3xl md:text-5xl font-bold leading-tight mb-5">
+                Penginjilan dan Penguatan Ekonomi<br>untuk Anak Muda Papua
+            </h2>
+            <p class="text-lg md:text-xl text-white/90 mb-10 max-w-3xl mx-auto">
+                Kami bergerak dalam penginjilan yang berdampak sosial, sambil memfasilitasi pelatihan ekonomi, pendampingan usaha,
+                dan kolaborasi lintas komunitas agar generasi muda Papua bertumbuh secara rohani dan mandiri.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="document.getElementById('program').scrollIntoView({ behavior: 'smooth' })"
+                        class="btn-cream px-8 py-4 rounded-2xl font-semibold text-lg">
+                    Lihat Program
+                </button>
+                <button onclick="document.getElementById('kontak').scrollIntoView({ behavior: 'smooth' })"
+                        class="btn-glass px-8 py-4 rounded-2xl font-semibold text-lg">
+                    Gabung Kolaborasi
+                </button>
+            </div>
+        </div>
+
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <i class="fas fa-chevron-down text-3xl"></i>
+        </div>
+    </header>
+
+    <!-- SECTION 2: TENTANG KAMI -->
+    <section id="tentang" class="py-20 section-light">
+        <div class="tail-container px-6">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <!-- Kiri -->
+                <div>
+                    <span class="chip inline-block px-4 py-2 rounded-full text-sm font-medium mb-4">Tentang IFK</span>
+                    <h2 class="section-title text-4xl font-bold leading-tight mb-6">
+                        Sekilas Tentang Kami
+                    </h2>
+                    <p class="section-text text-lg mb-8">
+                        Yayasan Inisiatif, Fasilitasi, dan Kolaborasi untuk Papua berfokus pada pelayanan penginjilan
+                        yang berjalan beriringan dengan penguatan ekonomi. Fokus utama kami adalah anak-anak muda Papua
+                        agar memiliki karakter, keterampilan, dan kesempatan untuk membangun masa depan yang mandiri.
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <button onclick="document.getElementById('program').scrollIntoView({ behavior: 'smooth' })" 
+                                class="btn-primary px-8 py-4 rounded-2xl font-semibold flex items-center gap-3">
+                            <i class="fas fa-arrow-right"></i>
+                            Program Kami
+                        </button>
+                        <button onclick="document.getElementById('kontak').scrollIntoView({ behavior: 'smooth' })" 
+                                class="px-8 py-4 rounded-2xl font-semibold flex items-center gap-3 transition"
+                                style="border:1px solid rgba(106,67,40,0.38); color: var(--earth); background: rgba(255,255,255,0.45);">
+                            Dukung Gerakan
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Kanan -->
+                <div class="relative">
+                    <img src="./img/youth-blue.png"
+                         alt="Kegiatan Yayasan IFK Papua"
+                         class="rounded-3xl w-full shadow-xl"
+                         style="box-shadow: var(--soft-shadow-lg);">
+                    <div class="absolute -bottom-6 -left-6 glass-card p-6 rounded-3xl max-w-[240px]">
+                        <div class="flex items-center gap-4">
+                            <div class="text-3xl section-title">
+                                <i class="fa-solid fa-people-group"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-xl section-title">1200+</div>
+                                <div class="text-sm text-muted">Pemuda dampingan</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: GALERI KEGIATAN -->
+    <section id="kegiatan" class="py-20 section-cream">
+        <div class="tail-container px-6">
+            <div class="text-center mb-12">
+                <h2 class="section-title text-4xl font-bold mb-3">Kegiatan Lapangan</h2>
+                <p class="text-muted max-w-2xl mx-auto">Kegiatan penginjilan, pemuridan, dan penguatan ekonomi kreatif yang dijalankan bersama komunitas muda Papua.</p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <!-- Card 1 -->
+                <div class="card-modern rounded-3xl overflow-hidden card-hover">
+                    <img src="./img/youth-red.png" class="w-full h-52 object-cover" alt="">
+                    <div class="p-5">
+                        <h4 class="font-semibold text-lg mb-1 section-title">Kebaktian Pemuda</h4>
+                        <p class="text-sm text-muted line-clamp-2">Ibadah dan pemuridan anak muda lintas komunitas di Papua.</p>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="card-modern rounded-3xl overflow-hidden card-hover">
+                    <img src="./img/youth-blue.png" class="w-full h-52 object-cover" alt="">
+                    <div class="p-5">
+                        <h4 class="font-semibold text-lg mb-1 section-title">Kelas Wirausaha Muda</h4>
+                        <p class="text-sm text-muted line-clamp-2">Pelatihan bisnis dasar, keuangan, dan pemasaran digital.</p>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="card-modern rounded-3xl overflow-hidden card-hover">
+                    <img src="./img/youth-fun.png" class="w-full h-52 object-cover" alt="">
+                    <div class="p-5">
+                        <h4 class="font-semibold text-lg mb-1 section-title">Mentoring Kepemimpinan</h4>
+                        <p class="text-sm text-muted line-clamp-2">Pendampingan karakter dan kepemimpinan bagi pemuda gereja.</p>
+                    </div>
+                </div>
+                <!-- Card 4 -->
+                <div class="card-modern rounded-3xl overflow-hidden card-hover">
+                    <img src="./img/danau.png" class="w-full h-52 object-cover" alt="">
+                    <div class="p-5">
+                        <h4 class="font-semibold text-lg mb-1 section-title">Pasar Karya Lokal</h4>
+                        <p class="text-sm text-muted line-clamp-2">Akses promosi produk kreatif pemuda dari berbagai wilayah Papua.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: PROGRAM DAN KEGIATAN -->
+    <section id="program" class="py-20 section-light">
+        <div class="tail-container px-6">
+            <div class="text-center mb-12">
+                <h2 class="section-title text-4xl font-bold mb-3">Program Unggulan</h2>
+                <p class="text-muted">Empat program utama untuk pertumbuhan rohani dan kemandirian ekonomi pemuda Papua</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Program 1 -->
+                <div class="card-modern rounded-3xl p-8 card-hover">
+                    <div class="icon-badge icon-forest">
+                        <i class="fa-solid fa-bible"></i>
+                    </div>
+                    <h3 class="section-title text-2xl font-semibold mb-3">Penginjilan dan Pemuridan</h3>
+                    <p class="text-muted">Pemuridan kontekstual, kebaktian pemuda, dan pembinaan iman untuk membangun karakter Kristiani.</p>
+                </div>
+                
+                <!-- Program 2 -->
+                <div class="card-modern rounded-3xl p-8 card-hover">
+                    <div class="icon-badge icon-ocean">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
+                    <h3 class="section-title text-2xl font-semibold mb-3">Penguatan Ekonomi Muda</h3>
+                    <p class="text-muted">Pelatihan kewirausahaan, literasi keuangan, dan pendampingan usaha mikro anak muda.</p>
+                </div>
+                
+                <!-- Program 3 -->
+                <div class="card-modern rounded-3xl p-8 card-hover">
+                    <div class="icon-badge icon-gold">
+                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                    </div>
+                    <h3 class="section-title text-2xl font-semibold mb-3">Pelatihan Keterampilan</h3>
+                    <p class="text-muted">Kelas keterampilan kerja, digital kreatif, dan produksi lokal untuk meningkatkan daya saing.</p>
+                </div>
+                
+                <!-- Program 4 -->
+                <div class="card-modern rounded-3xl p-8 card-hover">
+                    <div class="icon-badge icon-earth">
+                        <i class="fa-solid fa-handshake"></i>
+                    </div>
+                    <h3 class="section-title text-2xl font-semibold mb-3">Kolaborasi Komunitas</h3>
+                    <p class="text-muted">Sinergi dengan gereja, sekolah, dan mitra lokal untuk memperluas dampak pelayanan di Papua.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 5: FAQ -->
+    <section id="faq" class="py-20 section-cream">
+        <div class="tail-container px-6 max-w-3xl mx-auto">
+            <h2 class="section-title text-4xl font-bold text-center mb-12">Pertanyaan yang Sering Diajukan</h2>
+            
+            <div x-data="{ open: 1 }" class="space-y-4">
+                <!-- FAQ 1 -->
+                <div class="glass-card rounded-3xl overflow-hidden">
+                    <button @click="open = 1" class="w-full px-8 py-6 text-left flex justify-between items-center font-medium section-title">
+                        Apa fokus utama pelayanan IFK?
+                        <i :class="open === 1 ? 'fa-chevron-up' : 'fa-chevron-down'" class="fas"></i>
+                    </button>
+                    <div x-show="open === 1" class="px-8 pb-6 text-muted">
+                        IFK berfokus pada penginjilan dan pemuridan anak muda Papua, sambil menguatkan aspek ekonomi melalui pelatihan dan pendampingan usaha.
+                    </div>
+                </div>
+                
+                <!-- FAQ 2 -->
+                <div class="glass-card rounded-3xl overflow-hidden">
+                    <button @click="open = 2" class="w-full px-8 py-6 text-left flex justify-between items-center font-medium section-title">
+                        Siapa peserta utama program IFK?
+                        <i :class="open === 2 ? 'fa-chevron-up' : 'fa-chevron-down'" class="fas"></i>
+                    </button>
+                    <div x-show="open === 2" class="px-8 pb-6 text-muted">
+                        Program kami diprioritaskan untuk anak muda Papua di komunitas gereja, sekolah, dan kelompok pemuda setempat.
+                    </div>
+                </div>
+                
+                <!-- FAQ 3 -->
+                <div class="glass-card rounded-3xl overflow-hidden">
+                    <button @click="open = 3" class="w-full px-8 py-6 text-left flex justify-between items-center font-medium section-title">
+                        Apa saja bentuk penguatan ekonomi yang dilakukan?
+                        <i :class="open === 3 ? 'fa-chevron-up' : 'fa-chevron-down'" class="fas"></i>
+                    </button>
+                    <div x-show="open === 3" class="px-8 pb-6 text-muted">
+                        Kami menjalankan pelatihan wirausaha, mentoring bisnis kecil, literasi keuangan, dan akses promosi produk lokal.
+                    </div>
+                </div>
+                
+                <!-- FAQ 4 -->
+                <div class="glass-card rounded-3xl overflow-hidden">
+                    <button @click="open = 4" class="w-full px-8 py-6 text-left flex justify-between items-center font-medium section-title">
+                        Bagaimana cara menjadi relawan atau mitra program?
+                        <i :class="open === 4 ? 'fa-chevron-up' : 'fa-chevron-down'" class="fas"></i>
+                    </button>
+                    <div x-show="open === 4" class="px-8 pb-6 text-muted">
+                        Anda dapat mengisi formulir di halaman kontak dan memilih topik kerjasama atau relawan untuk ditindaklanjuti tim kami.
+                    </div>
+                </div>
+                
+                <!-- FAQ 5 -->
+                <div class="glass-card rounded-3xl overflow-hidden">
+                    <button @click="open = 5" class="w-full px-8 py-6 text-left flex justify-between items-center font-medium section-title">
+                        Di wilayah mana IFK melayani saat ini?
+                        <i :class="open === 5 ? 'fa-chevron-up' : 'fa-chevron-down'" class="fas"></i>
+                    </button>
+                    <div x-show="open === 5" class="px-8 pb-6 text-muted">
+                        IFK melayani komunitas muda di beberapa titik Papua dan terus memperluas jangkauan melalui jaringan gereja dan mitra lokal.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 6: CTA -->
+    <section class="py-16 brand-cta text-white">
+        <div class="tail-container px-6 text-center">
+            <h2 class="text-4xl font-bold mb-4">Bersama Membangun Generasi Muda Papua</h2>
+            <p class="text-xl text-white/90 mb-8 max-w-3xl mx-auto">Dukung pelayanan penginjilan dan program penguatan ekonomi agar anak muda Papua bertumbuh dalam iman, keterampilan, dan kemandirian.</p>
+            <button onclick="document.getElementById('kontak').scrollIntoView({ behavior: 'smooth' })" 
+                    class="btn-cream px-10 py-5 rounded-3xl text-xl font-semibold">
+                Hubungi Kami Sekarang
+            </button>
+        </div>
+    </section>
+
+    <!-- SECTION 7: KONTAK -->
+    <section id="kontak" class="py-20 section-light">
+        <div class="tail-container px-6">
+            <div class="grid lg:grid-cols-2 gap-16">
+                <!-- Left Column -->
+                <div>
+                    <h2 class="section-title text-4xl font-bold mb-8">Hubungi Kami</h2>
+                    
+                    <div class="space-y-8">
+                        <div class="flex gap-5">
+                            <div class="icon-chip icon-chip-ocean">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold mb-1 section-title">Alamat Kantor</div>
+                                <div class="text-muted">Jl. Raya Abepura No. 45, Jayapura, Papua 99221</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-5">
+                            <div class="icon-chip icon-chip-forest">
+                                <i class="fa-solid fa-phone"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold mb-1 section-title">Telepon / WhatsApp</div>
+                                <div class="text-muted">+62 812-3456-7890</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-5">
+                            <div class="icon-chip icon-chip-gold">
+                                <i class="fa-solid fa-envelope"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold mb-1 section-title">Email</div>
+                                <div class="text-muted">info@ifkpapua.org</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-12">
+                        <div class="font-semibold mb-4 section-title">Ikuti Kami</div>
+                        <div class="flex gap-6 text-3xl">
+                            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>
+                    
+                    <!-- Leaflet Map -->
+                    <div class="mt-12">
+                        <div id="map" class="h-80 rounded-3xl shadow-inner border border-white/40"></div>
+                    </div>
+                </div>
+                
+                <!-- Right Column: Form -->
+                <div class="glass-card p-8 rounded-3xl">
+                    <h3 class="section-title text-2xl font-semibold mb-6">Kirim Pesan</h3>
+                    <form id="contactForm" class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2 section-title">Nama Lengkap</label>
+                            <input type="text" class="input-modern" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2 section-title">Email</label>
+                            <input type="email" class="input-modern" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2 section-title">Topik</label>
+                            <select class="input-modern">
+                                <option value="">Pilih Topik</option>
+                                <option value="program">Kerjasama Program</option>
+                                <option value="donasi">Donasi &amp; Sponsorship</option>
+                                <option value="relawan">Menjadi Relawan</option>
+                                <option value="lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2 section-title">Pesan</label>
+                            <textarea rows="5" class="input-modern resize-y rounded-3xl" required></textarea>
+                        </div>
+                        
+                        <button type="submit" 
+                                class="w-full btn-primary py-5 rounded-3xl font-semibold text-lg">
+                            Kirim Pesan
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 8: FOOTER -->
+    <footer class="footer-brand text-white py-16">
+        <div class="tail-container px-6 text-center">
+            <div class="flex justify-center mb-6">
+                <img src="./img/logo.png" alt="Logo IFK" class="w-16 h-16 object-contain logo-circle">
+            </div>
+            <p class="text-white/85 max-w-md mx-auto">
+                Inisiatif • Fasilitasi • Kolaborasi<br>
+                <a href="https://nokensoft.com" target="_blank" rel="noopener noreferrer" class="underline hover:no-underline">
+                    Powered by Nokensoft.com
+                </a><br>
+                Bersama melayani dan memberdayakan anak muda Papua.
+            </p>
+            <div class="mt-12 pt-8 border-t border-white/20 text-sm text-white/70">
+                © 2026 Yayasan Inisiatif, Fasilitasi, Kolaborasi untuk Papua. All Rights Reserved.
+            </div>
+        </div>
+    </footer>
+
+    <div class="floating-actions" aria-label="Floating Actions">
+        <a href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer" class="floating-btn floating-wa" aria-label="Chat WhatsApp">
+            <i class="fa-brands fa-whatsapp"></i>
+        </a>
+        <button id="backToTopBtn" type="button" class="floating-btn back-to-top-btn" aria-label="Kembali ke atas">
+            <i class="fa-solid fa-arrow-up"></i>
+        </button>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Tailwind script
+        function initTailwind() {
+            // Already configured via CDN
+        }
+        
+        // Simple map
+        document.addEventListener('DOMContentLoaded', function() {
+            const map = L.map('map').setView([-2.5489, 140.7143], 13);
+            const stickyTopbar = document.getElementById('stickyTopbar');
+            const heroHeader = document.getElementById('heroHeader');
+            const backToTopBtn = document.getElementById('backToTopBtn');
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+            
+            L.marker([-2.5489, 140.7143]).addTo(map)
+                .bindPopup('Kantor Yayasan IFK Papua<br>Jayapura')
+                .openPopup();
+            
+            // Form submission alert
+            const form = document.getElementById('contactForm');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Terima kasih! Pesan Anda telah kami terima. Kami akan segera menghubungi Anda.');
+                form.reset();
+            });
+
+            function handleScrollUI() {
+                const heroThreshold = heroHeader ? Math.max(heroHeader.offsetHeight - 120, 180) : 260;
+
+                if (window.scrollY > heroThreshold) {
+                    stickyTopbar.classList.add('show');
+                } else {
+                    stickyTopbar.classList.remove('show');
+                }
+
+                if (window.scrollY > 360) {
+                    backToTopBtn.classList.add('show');
+                } else {
+                    backToTopBtn.classList.remove('show');
+                }
+            }
+
+            window.addEventListener('scroll', handleScrollUI, { passive: true });
+            handleScrollUI();
+
+            backToTopBtn.addEventListener('click', function() {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                if (this.getAttribute('href') !== '#') {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
